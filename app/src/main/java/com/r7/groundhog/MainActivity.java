@@ -1,8 +1,7 @@
 package com.r7.groundhog;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.telephony.SubscriptionManager;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -28,9 +27,10 @@ public class MainActivity extends AppCompatActivity {
             }, RequestPermissionCode);
         } else {
             Log.d("GroundHog", "Permission granted");
-            performService();
+            startService(new Intent(this, RecurringJobIntentService.class));
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -39,11 +39,10 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PERMISSION_GRANTED
                         && grantResults[1] == PERMISSION_GRANTED) {
-                    performService();
+                    startService(new Intent(this, RecurringJobIntentService.class));
                 } else {
                     Log.d("GroundHog", "Permission denied");
                 }
-                return;
             }
         }
     }
@@ -56,11 +55,4 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    void performService() {
-        SubscriptionManager sm = getSystemService(SubscriptionManager.class);
-        TelephonyManager tm = getSystemService(TelephonyManager.class);
-        Subscription s = new Subscription(sm);
-        TelephonyRunner tr = new TelephonyRunner(s, tm);
-        tr.performUssdRequest("*556#");
-    }
 }
